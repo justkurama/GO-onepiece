@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	handlers "github.com/justkurama/GOtsis1/internal"
 )
 
 func main() {

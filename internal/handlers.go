@@ -22,7 +22,7 @@ func GetMugiwaraByName(w http.ResponseWriter, r *http.Request) {
 
 	mugiwaraName = strings.ToLower(mugiwaraName)
 
-	for _, mugiwara := range Mugiwaras {
+	for _, mugiwara := range api.Mugiwaras {
 		if strings.ToLower(mugiwara.Name) == mugiwaraName {
 			json.NewEncoder(w).Encode(mugiwara)
 			return
@@ -37,7 +37,7 @@ func GetMugiwaraById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	mugiwaraId := params["id"]
 
-	for _, mugiwara := range Mugiwaras {
+	for _, mugiwara := range api.Mugiwaras {
 		if strconv.Itoa(mugiwara.Id) == mugiwaraId {
 			json.NewEncoder(w).Encode(mugiwara)
 			return
@@ -53,9 +53,9 @@ func GetMugiwarasByOrigin(w http.ResponseWriter, r *http.Request) {
 	origin := params["origin"]
 
 	origin = strings.ToLower(origin)
-	var matchingMugiwaras []Mugiwara
+	var matchingMugiwaras []api.Mugiwara
 
-	for _, mugiwara := range Mugiwaras {
+	for _, mugiwara := range api.Mugiwaras {
 		if strings.ToLower(mugiwara.Origin) == origin {
 			matchingMugiwaras = append(matchingMugiwaras, mugiwara)
 		}
@@ -80,9 +80,9 @@ func GetMugiwarasByBounty(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var matchingMugiwaras []Mugiwara
+	var matchingMugiwaras []api.Mugiwara
 
-	for _, mugiwara := range Mugiwaras {
+	for _, mugiwara := range api.Mugiwaras {
 		if mugiwara.Bounty == bounty {
 			matchingMugiwaras = append(matchingMugiwaras, mugiwara)
 		}
