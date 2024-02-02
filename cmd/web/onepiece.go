@@ -3,16 +3,23 @@ package onepiece
 import (
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", home)
-	mux.HandleFunc("/snippet/view", snippetView)
-	mux.HandleFunc("/snippet/create", snippetCreate)
+	log.Println("Starting API server")
+	router := mux.NewRouter()
 
-	log.Print("starting server on :4000")
+	log.Println("Creating routes")
+	router.HandleFunc("/mugiwaras", handlers.GetPlayers).Methods("GET")
+	router.HandleFunc("/mugiwaras/last_name/{nickname}", handlers.GetPlayerByName).Methods("GET")
+	router.HandleFunc("/mugiwaras/{id}", handlers.GetPlayerById).Methods("GET")
+	router.HandleFunc("/health-checking", handlers.HealthCheck).Methods("GET")
+	router.HandleFunc("/mugiwaras/position/{position}", handlers.GetPlayersByPosition).Methods("GET")
+	router.HandleFunc("/mugiwaras/nation/{nation}", handlers.GetPlayersByNation).Methods("GET")
+	http.Handle("/", router)
 
-	err := http.ListenAndServe(":4000", mux)
-	log.Fatal(err)
+	log.Println("Server started on :8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
