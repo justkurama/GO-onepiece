@@ -1,4 +1,4 @@
-package onepiece
+package main
 
 import (
 	"log"
