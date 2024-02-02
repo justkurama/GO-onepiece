@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/justkurama/gotsis1/api"
+	"github.com/justkurama/GOtsis1/api"
 )
 
 func GetPlayers(w http.ResponseWriter, r *http.Request) {
