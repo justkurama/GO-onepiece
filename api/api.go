@@ -1,6 +1,6 @@
 package api
 
-type mugiwaras struct {
+type Mugiwara struct {
 	Id          int    `json:"id"`
 	Name        string `json:"name"`
 	NickName    string `json:"nickname"`
@@ -10,7 +10,7 @@ type mugiwaras struct {
 	Occupations string `json:"occupations"`
 }
 
-var Mugiwaras = []mugiwaras{
+var Mugiwaras = []Mugiwara{
 	{1, "Monkey D. Luffy", "Straw Hat", 3000000000, "Gomu Gomu no Mi", "East Blue", "Captain"},
 	{2, "Roronoa Zoro", "Pirate Hunter", 1111000000, "None", "East Blue", "Swordsman"},
 	{3, "Nami", "Cat Burglar", 366000000, "None", "East Blue", "Navigator"},

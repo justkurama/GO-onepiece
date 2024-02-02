@@ -12,12 +12,12 @@ func main() {
 	router := mux.NewRouter()
 
 	log.Println("Creating routes")
-	router.HandleFunc("/mugiwaras", handlers.GetPlayers).Methods("GET")
-	router.HandleFunc("/mugiwaras/last_name/{nickname}", handlers.GetPlayerByName).Methods("GET")
-	router.HandleFunc("/mugiwaras/{id}", handlers.GetPlayerById).Methods("GET")
+	router.HandleFunc("/mugiwaras", handlers.GetMugiwara).Methods("GET")
+	router.HandleFunc("/mugiwaras/name/{name}", handlers.GetMugiwaraByName).Methods("GET")
+	router.HandleFunc("/mugiwaras/{id}", handlers.GetMugiwaraById).Methods("GET")
 	router.HandleFunc("/health-checking", handlers.HealthCheck).Methods("GET")
-	router.HandleFunc("/mugiwaras/position/{position}", handlers.GetPlayersByPosition).Methods("GET")
-	router.HandleFunc("/mugiwaras/nation/{nation}", handlers.GetPlayersByNation).Methods("GET")
+	router.HandleFunc("/mugiwaras/bounty/{bounty}", handlers.GetMugiwarasByBounty).Methods("GET")
+	router.HandleFunc("/mugiwaras/origin/{origin}", handlers.GetMugiwarasByOrigin).Methods("GET")
 	http.Handle("/", router)
 
 	log.Println("Server started on :8080")

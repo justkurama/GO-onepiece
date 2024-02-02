@@ -10,82 +10,88 @@ import (
 	"github.com/justkurama/GOtsis1/api"
 )
 
-func GetPlayers(w http.ResponseWriter, r *http.Request) {
+func GetMugiwara(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(api.Players)
+	json.NewEncoder(w).Encode(api.Mugiwaras)
 }
 
-func GetPlayerByName(w http.ResponseWriter, r *http.Request) {
+func GetMugiwaraByName(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	playerName := params["last_name"]
+	mugiwaraName := params["name"]
 
-	playerName = strings.ToLower(playerName)
+	mugiwaraName = strings.ToLower(mugiwaraName)
 
-	for _, player := range api.Players {
-		if strings.ToLower(player.LastName) == playerName {
-			json.NewEncoder(w).Encode(player)
+	for _, mugiwara := range Mugiwaras {
+		if strings.ToLower(mugiwara.Name) == mugiwaraName {
+			json.NewEncoder(w).Encode(mugiwara)
 			return
 		}
 	}
 
-	http.Error(w, "Player not found", http.StatusNotFound)
+	http.Error(w, "Mugiwara not found", http.StatusNotFound)
 }
 
-func GetPlayerById(w http.ResponseWriter, r *http.Request) {
+func GetMugiwaraById(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	playerId := params["id"]
+	mugiwaraId := params["id"]
 
-	for _, player := range api.Players {
-		if strconv.Itoa(player.Id) == playerId {
-			json.NewEncoder(w).Encode(player)
+	for _, mugiwara := range Mugiwaras {
+		if strconv.Itoa(mugiwara.Id) == mugiwaraId {
+			json.NewEncoder(w).Encode(mugiwara)
 			return
 		}
 	}
 
-	http.Error(w, "Player not found", http.StatusNotFound)
+	http.Error(w, "Mugiwara not found", http.StatusNotFound)
 }
 
-func GetPlayersByPosition(w http.ResponseWriter, r *http.Request) {
+func GetMugiwarasByOrigin(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	position := params["position"]
+	origin := params["origin"]
 
-	position = strings.ToLower(position)
-	var matchingPlayers []api.Player
+	origin = strings.ToLower(origin)
+	var matchingMugiwaras []Mugiwara
 
-	for _, player := range api.Players {
-		if strings.ToLower(player.Position) == position {
-			matchingPlayers = append(matchingPlayers, player)
+	for _, mugiwara := range Mugiwaras {
+		if strings.ToLower(mugiwara.Origin) == origin {
+			matchingMugiwaras = append(matchingMugiwaras, mugiwara)
 		}
 	}
 
-	if len(matchingPlayers) > 0 {
-		json.NewEncoder(w).Encode(matchingPlayers)
+	if len(matchingMugiwaras) > 0 {
+		json.NewEncoder(w).Encode(matchingMugiwaras)
 	} else {
-		http.Error(w, "Players with the specified position not found", http.StatusNotFound)
+		http.Error(w, "Mugiwaras from the specified origin not found", http.StatusNotFound)
 	}
 }
 
-func GetPlayersByNation(w http.ResponseWriter, r *http.Request) {
+func GetMugiwarasByBounty(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	nation := params["nation"]
+	bountyStr := params["bounty"]
 
-	nation = strings.ToLower(nation)
-	var matchingPlayers []api.Player
+	// Convert bounty string to int
+	bounty, err := strconv.Atoi(bountyStr)
+	if err != nil {
+		http.Error(w, "Invalid bounty value", http.StatusBadRequest)
+		return
+	}
 
-	for _, player := range api.Players {
-		if strings.ToLower(player.Nation) == nation {
-			matchingPlayers = append(matchingPlayers, player)
+	var matchingMugiwaras []Mugiwara
+
+	for _, mugiwara := range Mugiwaras {
+		if mugiwara.Bounty == bounty {
+			matchingMugiwaras = append(matchingMugiwaras, mugiwara)
 		}
 	}
 
-	if len(matchingPlayers) > 0 {
-		json.NewEncoder(w).Encode(matchingPlayers)
+	if len(matchingMugiwaras) > 0 {
+		json.NewEncoder(w).Encode(matchingMugiwaras)
 	} else {
-		http.Error(w, "Players from the specified nation not found", http.StatusNotFound)
+		http.Error(w, "Mugiwaras with the specified bounty not found", http.StatusNotFound)
 	}
 }
 
@@ -94,8 +100,8 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 
 	healthStatus := "App is healthy!\n\n"
 
-	appDescription := "This is a simple web API providing information about football players. It allows users to retrieve player details, perform searches, and check the overall health of the application.\n"
-	authorInfo := "\n\nAuthor: Bahauddin\n"
+	appDescription := "This is a simple web API providing information about Straw Hat Pirates from manga named One piece. It allows users to retrieve characters details, perform searches, and check the overall health of the application.\n"
+	authorInfo := "\n\nAuthor: Kurmanbek Tolebayev(justkurama)\n"
 
 	healthCheckResponse := healthStatus + appDescription + authorInfo
 
