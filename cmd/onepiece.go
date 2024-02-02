@@ -1,5 +1,5 @@
 // main
-package main
+package onepiece
 
 import (
 	"encoding/json"
