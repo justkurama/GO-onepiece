@@ -1,6 +1,3 @@
-Got it. Below is the updated README file reflecting the changes in the database tables:
-
----
 
 # One Piece Characters Web Service
 
@@ -135,6 +132,10 @@ This project is a web service built using Go (Golang) that runs locally on local
     "nickname": "Marine Hero"
   }
   ```
+
+## About team
+- Name: Straw Hats
+- Members: Kurmanbek and Dias
 
 ## Contributing
 Contributions are welcome! If you want to contribute to this project, please fork the repository and submit a pull request with your changes.
