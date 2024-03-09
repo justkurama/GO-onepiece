@@ -13,6 +13,7 @@ This project is a web service built using Go (Golang) that runs locally on local
 - **GET Method**: Retrieves information about One Piece characters from the database.
 - **POST Method**: Adds new characters to the database.
 - **PUT Method**: Updates existing character information in the database.
+- **DELETE Method**: Delete existing character information in the database.
 - **PostgreSQL Database**: Utilizes PostgreSQL to store and manage character data.
 
 ## Installation
