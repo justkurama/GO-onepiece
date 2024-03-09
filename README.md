@@ -135,7 +135,7 @@ This project is a web service built using Go (Golang) that runs locally on local
 
 ## About team
 - Name: Straw Hats
-- Members: Kurmanbek and Dias
+- Members: Kurmanbek(22B030597) and Dias(22B031174)
 
 ## Contributing
 Contributions are welcome! If you want to contribute to this project, please fork the repository and submit a pull request with your changes.
