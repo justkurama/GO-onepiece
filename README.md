@@ -4,6 +4,11 @@ Got it. Below is the updated README file reflecting the changes in the database 
 
 # One Piece Characters Web Service
 
+---
+![Hello](internal/image/luffy.jpg)
+---
+
+
 ## Description
 This project is a web service built using Go (Golang) that runs locally on localhost. It provides endpoints for GET, POST, and PUT methods to interact with a PostgreSQL database. The focus of this project is to manage data related to characters from the popular manga and anime series, One Piece.
 
