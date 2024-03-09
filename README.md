@@ -32,7 +32,7 @@ This project is a web service built using Go (Golang) that runs locally on local
 
 ## Database Schema
 
-![Table](C:\Users\User\Desktop\GO spring 2024\GO-onepiece\internal\image\table.png)
+![Table](internal/image/table.png)
 
 ### Character Table
 - Description: Stores information about One Piece characters.
