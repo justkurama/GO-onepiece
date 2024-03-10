@@ -11,8 +11,8 @@ import (
 func CreateOrganization(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
 	var organization models.Organization
-	organization.Name = r.URL.Query().Get("name")
-	err := db.Create(&organization).Error
+	err := json.NewDecoder(r.Body).Decode(&organization)
+	err = db.Create(&organization).Error
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, err := w.Write([]byte("Internal server error"))
@@ -71,10 +71,11 @@ func GetAllOrganizations(w http.ResponseWriter, r *http.Request) {
 func UpdateOrganization(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
 	params := mux.Vars(r)
-	id, _ := strconv.Atoi(params["id"])
-	name := r.URL.Query().Get("name")
 	var organization models.Organization
-	err := db.First(&organization, id).Error
+	err := json.NewDecoder(r.Body).Decode(&organization)
+	id, _ := strconv.Atoi(params["id"])
+	organization.ID = uint(id)
+	err = db.First(&organization, id).Error
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, err := w.Write([]byte("Internal server error"))
@@ -83,7 +84,6 @@ func UpdateOrganization(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	organization.Name = name
 	err = db.Save(&organization).Error
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

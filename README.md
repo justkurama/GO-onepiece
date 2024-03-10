@@ -2,7 +2,7 @@
 # One Piece Characters Web Service
 
 ---
-![Hello](internal/image/luffy.jpg)
+![Hello](assets/images/luffy.jpg)
 ---
 
 
@@ -35,7 +35,7 @@ This project is a web service built using Go (Golang) that runs locally on local
 
 ## Database Schema
 
-![Table](internal/image/table.png)
+![Table](assets/images/table.png)
 
 ### Character Table
 - Description: Stores information about One Piece characters.

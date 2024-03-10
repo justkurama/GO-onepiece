@@ -11,19 +11,9 @@ import (
 
 func CreateCharacter(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
-	name := r.URL.Query().Get("name")
-	nickname := r.URL.Query().Get("nickname")
-	originId, _ := strconv.Atoi(r.URL.Query().Get("originId"))
-	raceId, _ := strconv.Atoi(r.URL.Query().Get("raceId"))
-	organizationId, _ := strconv.Atoi(r.URL.Query().Get("organizationId"))
-	character := models.Character{
-		Name:           name,
-		NickName:       nickname,
-		OriginID:       uint(originId),
-		RaceID:         uint(raceId),
-		OrganizationID: uint(organizationId),
-	}
-	err := db.Create(&character).Error
+	var character models.Character
+	err := json.NewDecoder(r.Body).Decode(&character)
+	err = db.Create(&character).Error
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, err := w.Write([]byte("Internal server error"))
@@ -83,13 +73,9 @@ func UpdateCharacter(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
 	params := mux.Vars(r)
 	id, _ := strconv.Atoi(params["id"])
-	name := r.URL.Query().Get("name")
-	nickname := r.URL.Query().Get("nickname")
-	originId, _ := strconv.Atoi(r.URL.Query().Get("originId"))
-	raceId, _ := strconv.Atoi(r.URL.Query().Get("raceId"))
-	organizationId, _ := strconv.Atoi(r.URL.Query().Get("organizationId"))
 	var character models.Character
-	err := db.First(&character, id).Error
+	err := json.NewDecoder(r.Body).Decode(&character)
+	err = db.First(&character, id).Error
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, err := w.Write([]byte("Internal server error"))
@@ -98,11 +84,6 @@ func UpdateCharacter(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	character.Name = name
-	character.NickName = nickname
-	character.OriginID = uint(originId)
-	character.RaceID = uint(raceId)
-	character.OrganizationID = uint(organizationId)
 	err = db.Save(&character).Error
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
