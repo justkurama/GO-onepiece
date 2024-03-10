@@ -5,27 +5,27 @@ type Character struct {
 	Name           string
 	NickName       string
 	Origin         Origin
-	OriginID       uint `json:"-"`
+	OriginID       uint
 	Race           Race
-	RaceID         uint `json:"-"`
+	RaceID         uint
 	Organization   Organization
-	OrganizationID uint `json:"-"`
+	OrganizationID uint
 }
 
 type Origin struct {
 	ID         uint
 	Name       string
-	Characters []Character `json:"-"`
+	Characters []Character
 }
 
 type Race struct {
 	ID         uint
 	Name       string
-	Characters []Character `json:"-"`
+	Characters []Character
 }
 
 type Organization struct {
 	ID         uint
 	Name       string
-	Characters []Character `json:"-"`
+	Characters []Character
 }
