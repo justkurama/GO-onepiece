@@ -63,6 +63,12 @@ func GetAllCharacters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+
+	sortBy := r.URL.Query().Get("sortBy")
+	if sortBy == "" {
+		// id.asc is the default sort query
+		sortBy = "id.asc"
+	}
 	err = json.NewEncoder(w).Encode(characters)
 	if err != nil {
 		return
