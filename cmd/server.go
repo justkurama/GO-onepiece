@@ -1,11 +1,13 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
-	"github.com/justkurama/GO-onepiece/cmd/routes"
-	"github.com/justkurama/GO-onepiece/internal/pkg/database"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/justkurama/GO-onepiece/cmd/routes"
+
+	"github.com/justkurama/GO-onepiece/internal/pkg/database"
 )
 
 func runServer() {
@@ -17,6 +19,8 @@ func runServer() {
 	routes.MapOrganizationRoutes(router)
 	routes.MapOriginRoutes(router)
 	routes.MapRaceRoutes(router)
+	routes.MapAuthRoutes(router)
+
 	http.Handle("/", router)
 
 	log.Println("Server started on :8080")

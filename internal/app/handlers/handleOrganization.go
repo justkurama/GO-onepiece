@@ -2,10 +2,13 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
-	"github.com/justkurama/GO-onepiece/internal/app/models"
+	"errors"
 	"net/http"
 	"strconv"
+
+	"github.com/gorilla/mux"
+	"github.com/justkurama/GO-onepiece/internal/app/models"
+	"gorm.io/gorm"
 )
 
 func CreateOrganization(w http.ResponseWriter, r *http.Request) {
@@ -31,24 +34,35 @@ func CreateOrganization(w http.ResponseWriter, r *http.Request) {
 func GetOrganization(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
 	params := mux.Vars(r)
-	id, _ := strconv.Atoi(params["id"])
-	var organization models.Organization
-	err := db.First(&organization, id).Error
+	idStr, ok := params["id"]
+	if !ok {
+		http.Error(w, "ID parameter is missing", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, err := w.Write([]byte("Internal server error"))
-		if err != nil {
-			return
+		http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		return
+	}
+
+	var organization models.Organization
+	err = db.First(&organization, id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			http.Error(w, "Organization not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "Internal server error: "+err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
+
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(organization)
-	if err != nil {
-		return
+	if err := json.NewEncoder(w).Encode(organization); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
-	return
 }
+
 func GetAllOrganizations(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
 	var organizations []models.Organization

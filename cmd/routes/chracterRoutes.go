@@ -2,13 +2,18 @@ package routes
 
 import (
 	"github.com/gorilla/mux"
+	middlewares "github.com/justkurama/GO-onepiece/cmd/middleware"
 	"github.com/justkurama/GO-onepiece/internal/app/handlers"
 )
 
 func MapCharacterRoutes(router *mux.Router) {
-	router.HandleFunc("/characters", handlers.CreateCharacter).Methods("POST")
-	router.HandleFunc("/characters/{id}", handlers.GetCharacter).Methods("GET")
-	router.HandleFunc("/characters", handlers.GetAllCharacters).Methods("GET")
-	router.HandleFunc("/characters/{id}", handlers.UpdateCharacter).Methods("PUT")
-	router.HandleFunc("/characters/{id}", handlers.DeleteCharacter).Methods("DELETE")
+
+	characterRouter := router.PathPrefix("/characters").Subrouter()
+	characterRouter.Use(middlewares.AuthMiddleware)
+
+	characterRouter.HandleFunc("", handlers.CreateCharacter).Methods("POST")
+	characterRouter.HandleFunc("/{id}", handlers.GetCharacter).Methods("GET")
+	characterRouter.HandleFunc("", handlers.GetAllCharacters).Methods("GET")
+	characterRouter.HandleFunc("/{id}", handlers.UpdateCharacter).Methods("PUT")
+	characterRouter.HandleFunc("/{id}", handlers.DeleteCharacter).Methods("DELETE")
 }

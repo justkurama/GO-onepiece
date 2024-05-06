@@ -2,11 +2,13 @@ package handlers
 
 import (
 	"encoding/json"
+	"net/http"
+	"strconv"
+	"strings"
+
 	"github.com/gorilla/mux"
 	"github.com/justkurama/GO-onepiece/internal/app/models"
 	"gorm.io/gorm/clause"
-	"net/http"
-	"strconv"
 )
 
 func CreateCharacter(w http.ResponseWriter, r *http.Request) {
@@ -29,6 +31,7 @@ func CreateCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 	return
 }
+
 func GetCharacter(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
 	params := mux.Vars(r)
@@ -50,24 +53,57 @@ func GetCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 	return
 }
+
 func GetAllCharacters(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
+
+	// Handling pagination
+	page, err := strconv.Atoi(r.URL.Query().Get("page"))
+	if err != nil || page < 1 {
+		page = 1
+	}
+	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+	if err != nil || limit <= 0 {
+		limit = 10
+	}
+
+	// Handling sorting
+	sortBy := r.URL.Query().Get("sortBy")
+	if sortBy == "" {
+		sortBy = "id asc" // Default sort
+	} else {
+		allowedSortFields := map[string]bool{"id": true, "name": true}
+		sortFields := strings.Fields(sortBy)
+
+		if len(sortFields) == 1 {
+			sortFields = append(sortFields, "asc")
+		}
+
+		if len(sortFields) != 2 || !allowedSortFields[sortFields[0]] || (sortFields[1] != "asc" && sortFields[1] != "desc") {
+			http.Error(w, "Invalid sortBy parameter", http.StatusBadRequest)
+			return
+		}
+		sortBy = strings.Join(sortFields, " ")
+	}
+
+	offset := (page - 1) * limit
+
 	var characters []models.Character
-	err := db.Preload(clause.Associations).Find(&characters).Error
+	err = db.Preload(clause.Associations).Order(sortBy).Offset(offset).Limit(limit).Find(&characters).Error
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		_, err := w.Write([]byte("Internal server error"))
+		_, err = w.Write([]byte("Internal server error: " + err.Error()))
 		if err != nil {
 			return
 		}
 		return
 	}
+
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(characters)
 	if err != nil {
-		return
+		http.Error(w, "Failed to encode characters", http.StatusInternalServerError)
 	}
-	return
 }
 func UpdateCharacter(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)

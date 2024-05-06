@@ -1,34 +1,59 @@
 package database
 
 import (
+	"strconv"
+
 	"github.com/justkurama/GO-onepiece/internal/app/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"strconv"
 )
 
 const (
-	host     = "localhost"
-	port     = 5432
+	host     = "host.docker.internal"
+	port     = 5433
 	user     = "postgres"
-	password = "Kurama_0723"
+	password = "postgres"
 	dbname   = "onepiece"
 )
 
 var DB = GetDB()
 
 func Migrate() {
-	err := DB.AutoMigrate(&models.Origin{}, &models.Race{}, &models.Organization{}, &models.Character{})
+	err := DB.AutoMigrate(
+		&models.User{},
+		&models.Role{},
+		&models.Permission{},
+		&models.UserRole{},
+		&models.RolePermission{},
+
+		&models.Origin{},
+		&models.Race{},
+		&models.Organization{},
+		&models.Character{})
 	if err != nil {
 		panic("migration failed")
-		return
 	}
 	addInitialData()
 }
 
 func addInitialData() {
+	addAdmin()
 	addOrigins()
 	addRaces()
+	addOrganization()
+}
+
+func addAdmin() {
+	var count int64
+	DB.Model(&models.User{}).Count(&count)
+	if count > 0 {
+		return
+	}
+	admin := models.User{
+		Login:    "admin",
+		Password: "admin",
+	}
+	DB.Create(&admin)
 }
 func addOrigins() {
 	var count int64
@@ -65,6 +90,23 @@ func addRaces() {
 	}
 	for _, race := range races {
 		DB.Create(&race)
+	}
+}
+func addOrganization() {
+	var count int64
+	DB.Model(&models.Organization{}).Count(&count)
+	if count > 0 {
+		return
+	}
+	organizations := []models.Organization{
+		{Name: "Pirate Crews"},
+		{Name: "Marines"},
+		{Name: "Seven Warlords"},
+		{Name: "World Government"},
+		{Name: "Revolutionary Army"},
+	}
+	for _, organization := range organizations {
+		DB.Create(&organization)
 	}
 }
 func GetDB() *gorm.DB {
