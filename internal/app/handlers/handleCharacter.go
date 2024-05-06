@@ -101,7 +101,7 @@ func GetAllCharacters(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 
-	sortBy := r.URL.Query().Get("sortBy")
+	sortBy = r.URL.Query().Get("sortBy")
 	if sortBy == "" {
 		// id.asc is the default sort query
 		sortBy = "id.asc"
