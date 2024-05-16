@@ -13,28 +13,39 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateOrganization(w http.ResponseWriter, r *http.Request) {
+func CreateSubOrganization(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
-	var organization models.Organization
-	err := json.NewDecoder(r.Body).Decode(&organization)
-	err = db.Create(&organization).Error
+
+	// Decode request body to get the sub-organization data
+	var subOrg models.SubOrganization
+	err := json.NewDecoder(r.Body).Decode(&subOrg)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, err := w.Write([]byte("Internal server error"))
-		if err != nil {
-			return
-		}
+		http.Error(w, "Failed to decode request body", http.StatusBadRequest)
 		return
 	}
+
+	// Ensure that the parent organization exists
+	var parentOrg models.Organization
+	if err := db.First(&parentOrg, subOrg.OrganizationID).Error; err != nil {
+		http.Error(w, "Parent organization not found", http.StatusNotFound)
+		return
+	}
+
+	// Create the sub-organization
+	if err := db.Create(&subOrg).Error; err != nil {
+		http.Error(w, "Failed to create sub-organization", http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
-	_, err = w.Write([]byte("Organization created"))
+	_, err = w.Write([]byte("Sub-organization created"))
 	if err != nil {
+		http.Error(w, "Failed to write response", http.StatusInternalServerError)
 		return
 	}
-	return
 }
 
-func GetOrganization(w http.ResponseWriter, r *http.Request) {
+func GetOSubOrganization(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
 	params := mux.Vars(r)
 	idStr, ok := params["id"]
@@ -65,7 +76,7 @@ func GetOrganization(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
 }
-func GetOrganizationCharacters(w http.ResponseWriter, r *http.Request) {
+func GetSubOrganizationCharacters(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
 	params := mux.Vars(r)
 	idStr, ok := params["id"]
@@ -125,7 +136,7 @@ func GetOrganizationCharacters(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetAllOrganizations(w http.ResponseWriter, r *http.Request) {
+func GetAllSubOrganizations(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
 
 	page, err := strconv.Atoi(r.URL.Query().Get("page"))
@@ -181,7 +192,7 @@ func GetAllOrganizations(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func UpdateOrganization(w http.ResponseWriter, r *http.Request) {
+func UpdateSubOrganization(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
 	params := mux.Vars(r)
 	var organization models.Organization
@@ -213,7 +224,7 @@ func UpdateOrganization(w http.ResponseWriter, r *http.Request) {
 	}
 	return
 }
-func DeleteOrganization(w http.ResponseWriter, r *http.Request) {
+func DeleteSubOrganization(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
 	params := mux.Vars(r)
 	id, _ := strconv.Atoi(params["id"])

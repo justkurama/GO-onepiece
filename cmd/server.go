@@ -20,6 +20,7 @@ func runServer() {
 	routes.MapOriginRoutes(router)
 	routes.MapRaceRoutes(router)
 	routes.MapAuthRoutes(router)
+	routes.MapSubOrganizationRoutes(router)
 
 	http.Handle("/", router)
 

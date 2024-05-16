@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
+	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 
@@ -24,24 +26,23 @@ func GetRace(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if id <= 0 {
-		http.Error(w, "Invalid ID. ID must be greater than 0", http.StatusBadRequest)
-		return
-	}
-
 	var race models.Race
 	err = db.First(&race, id).Error
 	if err != nil {
-		http.Error(w, "Race not found", http.StatusNotFound)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			http.Error(w, "Race not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "Internal server error: "+err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(race)
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(race); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
 }
+
 func GetAllRaces(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
 	var races []models.Race

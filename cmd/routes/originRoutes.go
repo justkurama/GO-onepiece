@@ -11,6 +11,7 @@ func MapOriginRoutes(router *mux.Router) {
 	api := router.PathPrefix("/origins").Subrouter()
 	api.Use(middlewares.AuthMiddleware)
 	api.HandleFunc("/{id}", handlers.GetOrigin).Methods("GET")
+	api.HandleFunc("/{id}/character", handlers.GetOriginCharacters).Methods("GET")
 	api.HandleFunc("", handlers.GetAllOrigins).Methods("GET")
 
 }

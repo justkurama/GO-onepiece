@@ -15,21 +15,41 @@ func CreateCharacter(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
 	var character models.Character
 	err := json.NewDecoder(r.Body).Decode(&character)
-	err = db.Create(&character).Error
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, err := w.Write([]byte("Internal server error"))
-		if err != nil {
-			return
-		}
+		http.Error(w, "Failed to decode request body", http.StatusBadRequest)
 		return
 	}
+
+	// Assuming the request body includes the SubOrganizationID
+	subOrgID := r.URL.Query().Get("sub_organization_id")
+	if subOrgID != "" {
+		subOrgIDInt, err := strconv.Atoi(subOrgID)
+		if err != nil {
+			http.Error(w, "Invalid sub_organization_id", http.StatusBadRequest)
+			return
+		}
+		// Validate if sub-organization exists
+		var subOrg models.SubOrganization
+		if err := db.First(&subOrg, subOrgIDInt).Error; err != nil {
+			http.Error(w, "Sub-organization not found", http.StatusNotFound)
+			return
+		}
+		// Assign the sub-organization ID to the character
+		character.SubOrganizationID = uint(subOrgIDInt)
+	}
+
+	// Create the character
+	if err := db.Create(&character).Error; err != nil {
+		http.Error(w, "Failed to create character", http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
 	_, err = w.Write([]byte("Character created"))
 	if err != nil {
+		http.Error(w, "Failed to write response", http.StatusInternalServerError)
 		return
 	}
-	return
 }
 
 func GetCharacter(w http.ResponseWriter, r *http.Request) {

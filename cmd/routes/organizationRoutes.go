@@ -14,6 +14,7 @@ func MapOrganizationRoutes(router *mux.Router) {
 	api.HandleFunc("", handlers.CreateOrganization).Methods("POST")
 
 	api.HandleFunc("/{id}", handlers.GetOrganization).Methods("GET")
+	api.HandleFunc("/{id}/character", handlers.GetOrganizationCharacters).Methods("GET")
 	api.HandleFunc("", handlers.GetAllOrganizations).Methods("GET")
 	api.HandleFunc("/{id}", handlers.UpdateOrganization).Methods("PUT")
 	api.HandleFunc("/{id}", handlers.DeleteOrganization).Methods("DELETE")
