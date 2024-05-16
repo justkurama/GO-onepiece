@@ -9,10 +9,11 @@ import (
 )
 
 const (
-	host     = "host.docker.internal"
-	port     = 5433
+	//host = "host.docker.internal"
+	host     = "localhost"
+	port     = 5432
 	user     = "postgres"
-	password = "postgres"
+	password = "kurama_0723"
 	dbname   = "onepiece"
 )
 
@@ -29,7 +30,8 @@ func Migrate() {
 		&models.Origin{},
 		&models.Race{},
 		&models.Organization{},
-		&models.Character{})
+		&models.Character{},
+		&models.SubOrganization{})
 	if err != nil {
 		panic("migration failed")
 	}
@@ -99,11 +101,11 @@ func addOrganization() {
 		return
 	}
 	organizations := []models.Organization{
-		{Name: "Pirate Crews"},
-		{Name: "Marines"},
-		{Name: "Seven Warlords"},
-		{Name: "World Government"},
-		{Name: "Revolutionary Army"},
+		{Name: "Pirate Crews", ParentID: 1},
+		{Name: "Marines", ParentID: 2},
+		{Name: "Seven Warlords", ParentID: 3},
+		{Name: "World Government", ParentID: 4},
+		{Name: "Revolutionary Army", ParentID: 5},
 	}
 	for _, organization := range organizations {
 		DB.Create(&organization)
