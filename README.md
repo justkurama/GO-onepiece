@@ -37,33 +37,81 @@ This project is a web service built using Go (Golang) that runs locally on local
 
 ![Table](assets/images/table.png)
 
-### Character Table
-- Description: Stores information about One Piece characters.
-- Columns:
-  - **ID**: Unique identifier for the character (Primary Key)
-  - **Name**: Full name of the character
-  - **NickName**: Nickname of the character
-  - **Origin**: Foreign key referencing the `Origin` table
-  - **Race**: Foreign key referencing the `Races` table
-  - **Organization**: Foreign key referencing the `Organization` table
+# Database Models
 
-### Origin Table
-- Description: Stores information about the origin of characters.
-- Columns:
-  - **ID**: Unique identifier for the origin (Primary Key)
-  - **Name**: Name of the origin
+This application uses GORM to manage its database models. Below are the details of the models used in this project.
 
-### Races Table
-- Description: Stores information about the races of characters.
-- Columns:
-  - **ID**: Unique identifier for the race (Primary Key)
-  - **Name**: Name of the race
+## Models
 
-### Organization Table
-- Description: Stores information about organizations characters belong to.
-- Columns:
-  - **ID**: Unique identifier for the organization (Primary Key)
-  - **Name**: Name of the organization
+### Character
+
+The `Character` model represents a character in the database.
+
+| Field              | Type     | Description                    |
+|--------------------|----------|--------------------------------|
+| ID                 | uint     | Primary key                    |
+| Name               | string   | The name of the character      |
+| NickName           | string   | The nickname of the character  |
+| Origin             | Origin   | Associated origin              |
+| OriginID           | uint     | Foreign key to Origin          |
+| Race               | Race     | Associated race                |
+| RaceID             | uint     | Foreign key to Race            |
+| Organization       | Organization | Associated organization     |
+| OrganizationID     | uint     | Foreign key to Organization    |
+| SubOrganization    | SubOrganization | Associated sub-organization |
+| SubOrganizationID  | uint     | Foreign key to SubOrganization |
+
+### Origin
+
+The `Origin` model represents the origin or birthplace of a character.
+
+| Field       | Type           | Description                           |
+|-------------|----------------|---------------------------------------|
+| ID          | uint           | Primary key                           |
+| Name        | string         | The name of the origin                |
+| Characters  | []Character    | List of characters from this origin   |
+
+### Race
+
+The `Race` model represents the race or species of a character.
+
+| Field       | Type           | Description                           |
+|-------------|----------------|---------------------------------------|
+| ID          | uint           | Primary key                           |
+| Name        | string         | The name of the race                  |
+| Characters  | []Character    | List of characters of this race       |
+
+### Organization
+
+The `Organization` model represents an organization to which a character may belong.
+
+| Field              | Type              | Description                            |
+|--------------------|-------------------|----------------------------------------|
+| ID                 | uint              | Primary key                            |
+| Name               | string            | The name of the organization           |
+| Characters         | []Character       | List of characters in this organization|
+| SubOrganizations   | []SubOrganization | List of sub-organizations under this organization |
+
+### SubOrganization
+
+The `SubOrganization` model represents a sub-organization that belongs to an organization.
+
+| Field       | Type            | Description                                      |
+|-------------|-----------------|--------------------------------------------------|
+| ID          | uint            | Primary key                                      |
+| Name        | string          | The name of the sub-organization                 |
+| ParentID    | uint            | Foreign key to the parent organization           |
+| Parent      | Organization    | The parent organization to which it belongs      |
+
+## Relationships
+
+- A `Character` belongs to an `Origin`, `Race`, `Organization`, and `SubOrganization`.
+- An `Origin` can have many `Characters`.
+- A `Race` can have many `Characters`.
+- An `Organization` can have many `Characters` and many `SubOrganizations`.
+- A `SubOrganization` belongs to an `Organization`.
+
+This structure ensures the proper associations between entities and facilitates the management of relationships using GORM.
 
 ## Endpoints
 
