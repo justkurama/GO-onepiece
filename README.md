@@ -120,40 +120,113 @@ This structure ensures the proper associations between entities and facilitates 
 - Example Response:
   ```
   [
-    
     {
         "ID": 1,
         "Name": "Monkey D. Luffy",
         "NickName": "Mugiwara",
         "Origin": {
             "ID": 1,
-            "Name": "East Blue"
+            "Name": "East Blue",
+            "Characters": null
         },
+        "OriginID": 1,
         "Race": {
             "ID": 1,
-            "Name": "Human"
+            "Name": "Human",
+            "Characters": null
         },
+        "RaceID": 1,
         "Organization": {
             "ID": 1,
-            "Name": "Pirate"
-        }
+            "Name": "Pirate Crews",
+            "Characters": null,
+            "SubOrganizations": null
+        },
+        "OrganizationID": 1,
+        "SubOrganization": {
+            "ID": 1,
+            "Name": "Straw Hat Pirates",
+            "ParentID": 1,
+            "Parent": {
+                "ID": 0,
+                "Name": "",
+                "Characters": null,
+                "SubOrganizations": null
+            }
+        },
+        "SubOrganizationID": 1
     },
     {
         "ID": 2,
-        "Name": "Koby",
-        "NickName": "Hero",
+        "Name": "Roronoa Zoro",
+        "NickName": "Pirate Hunter",
         "Origin": {
             "ID": 1,
-            "Name": "East Blue"
+            "Name": "East Blue",
+            "Characters": null
         },
+        "OriginID": 1,
         "Race": {
             "ID": 1,
-            "Name": "Human"
+            "Name": "Human",
+            "Characters": null
         },
+        "RaceID": 1,
         "Organization": {
-            "ID": 2,
-            "Name": "Marine"
-        }
+            "ID": 1,
+            "Name": "Pirate Crews",
+            "Characters": null,
+            "SubOrganizations": null
+        },
+        "OrganizationID": 1,
+        "SubOrganization": {
+            "ID": 1,
+            "Name": "Straw Hat Pirates",
+            "ParentID": 1,
+            "Parent": {
+                "ID": 0,
+                "Name": "",
+                "Characters": null,
+                "SubOrganizations": null
+            }
+        },
+        "SubOrganizationID": 1
+    },
+    {
+        "ID": 3,
+        "Name": "Nami",
+        "NickName": "Cat Burglar",
+        "Origin": {
+            "ID": 1,
+            "Name": "East Blue",
+            "Characters": null
+        },
+        "OriginID": 1,
+        "Race": {
+            "ID": 1,
+            "Name": "Human",
+            "Characters": null
+        },
+        "RaceID": 1,
+        "Organization": {
+            "ID": 1,
+            "Name": "Pirate Crews",
+            "Characters": null,
+            "SubOrganizations": null
+        },
+        "OrganizationID": 1,
+        "SubOrganization": {
+            "ID": 1,
+            "Name": "Straw Hat Pirates",
+            "ParentID": 1,
+            "Parent": {
+                "ID": 0,
+                "Name": "",
+                "Characters": null,
+                "SubOrganizations": null
+            }
+        },
+        "SubOrganizationID": 1
     }
     ...
   ]
@@ -164,11 +237,12 @@ This structure ensures the proper associations between entities and facilitates 
 - Payload:
   ```
   {
-    "name": "Nami",
-    "nickname": "Cat Burglar",
-    "origin": 1,
-    "race": 1,
-    "organization": 1
+    "Name": "Smoker",
+    "NickName": "White Hunter",
+    "OriginID": 5,
+    "RaceID": 1,
+    "OrganizationID": 2,
+    "SubOrganizationID": 7
   }
   ```
 
