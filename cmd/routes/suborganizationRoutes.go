@@ -12,8 +12,7 @@ func MapSubOrganizationRoutes(router *mux.Router) {
 	api.Use(middlewares.AuthMiddleware)
 
 	api.HandleFunc("", handlers.CreateSubOrganization).Methods("POST")
-
-	api.HandleFunc("/{id}", handlers.GetOSubOrganization).Methods("GET")
+	api.HandleFunc("/{id}", handlers.GetSubOrganization).Methods("GET")
 	api.HandleFunc("/{id}/character", handlers.GetSubOrganizationCharacters).Methods("GET")
 	api.HandleFunc("", handlers.GetAllSubOrganizations).Methods("GET")
 	api.HandleFunc("/{id}", handlers.UpdateSubOrganization).Methods("PUT")

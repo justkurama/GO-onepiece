@@ -1,41 +1,40 @@
 package models
 
 type Character struct {
-	ID                uint
+	ID                uint `gorm:"primaryKey"`
 	Name              string
 	NickName          string
-	Origin            Origin
+	Origin            Origin `gorm:"foreignKey:OriginID"`
 	OriginID          uint
-	Race              Race
+	Race              Race `gorm:"foreignKey:RaceID"`
 	RaceID            uint
-	Organization      Organization
+	Organization      Organization `gorm:"foreignKey:OrganizationID"`
 	OrganizationID    uint
-	SubOrganization   SubOrganization
+	SubOrganization   SubOrganization `gorm:"foreignKey:SubOrganizationID"`
 	SubOrganizationID uint
 }
 
 type Origin struct {
-	ID         uint
+	ID         uint `gorm:"primaryKey"`
 	Name       string
-	Characters []Character
+	Characters []Character `gorm:"foreignKey:OriginID"`
 }
 
 type Race struct {
-	ID         uint
+	ID         uint `gorm:"primaryKey"`
 	Name       string
-	Characters []Character
+	Characters []Character `gorm:"foreignKey:RaceID"`
 }
 
 type Organization struct {
-	ID               uint
+	ID               uint `gorm:"primaryKey"`
 	Name             string
-	Characters       []Character
-	SubOrganizations []SubOrganization
-	ParentID         uint
+	Characters       []Character       `gorm:"foreignKey:OrganizationID"`
+	SubOrganizations []SubOrganization `gorm:"foreignKey:ParentID"`
 }
 type SubOrganization struct {
-	ID             uint
-	Name           string
-	OrganizationID uint
-	Organization   Organization `gorm:"foreignKey:OrganizationID"` // Parent organization
+	ID       uint `gorm:"primaryKey"`
+	Name     string
+	ParentID uint
+	Parent   Organization `gorm:"foreignKey:ParentID;references:ID"`
 }

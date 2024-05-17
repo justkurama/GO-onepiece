@@ -43,6 +43,7 @@ func addInitialData() {
 	addOrigins()
 	addRaces()
 	addOrganization()
+	addSubOrganizations()
 }
 
 func addAdmin() {
@@ -53,7 +54,7 @@ func addAdmin() {
 	}
 	admin := models.User{
 		Login:    "admin",
-		Password: "admin",
+		Password: "admin	",
 	}
 	DB.Create(&admin)
 }
@@ -101,16 +102,39 @@ func addOrganization() {
 		return
 	}
 	organizations := []models.Organization{
-		{Name: "Pirate Crews", ParentID: 1},
-		{Name: "Marines", ParentID: 2},
-		{Name: "Seven Warlords", ParentID: 3},
-		{Name: "World Government", ParentID: 4},
-		{Name: "Revolutionary Army", ParentID: 5},
+		{Name: "Pirate Crews"},
+		{Name: "Marines"},
+		{Name: "Seven Warlords"},
+		{Name: "World Government"},
+		{Name: "Revolutionary Army"},
 	}
 	for _, organization := range organizations {
 		DB.Create(&organization)
 	}
 }
+func addSubOrganizations() {
+	var count int64
+	DB.Model(&models.SubOrganization{}).Count(&count)
+	if count > 0 {
+		return
+	}
+	subOrganizations := []models.SubOrganization{
+		{Name: "Straw Hat Pirates", ParentID: 1},        // Pirate Crews
+		{Name: "Red Hair Pirates", ParentID: 1},         // Pirate Crews
+		{Name: "Whitebeard Pirates", ParentID: 1},       // Pirate Crews
+		{Name: "Blackbeard Pirates", ParentID: 1},       // Pirate Crews
+		{Name: "Big Mom Pirates", ParentID: 1},          // Pirate Crews
+		{Name: "Marines HQ", ParentID: 2},               // Marines
+		{Name: "G-5", ParentID: 2},                      // Marines
+		{Name: "Cipher Pol", ParentID: 2},               // Marines
+		{Name: "Warlords Council", ParentID: 3},         // Seven Warlords
+		{Name: "Revolutionary Commanders", ParentID: 5}, // Revolutionary Army
+	}
+	for _, subOrganization := range subOrganizations {
+		DB.Create(&subOrganization)
+	}
+}
+
 func GetDB() *gorm.DB {
 	dbURL := "host=" + host + " port=" + strconv.Itoa(port) + " user=" + user + " password=" + password + " dbname=" + dbname
 	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
