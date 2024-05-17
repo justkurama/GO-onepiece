@@ -35,7 +35,7 @@ This project is a web service built using Go (Golang) that runs locally on local
 
 ## Database Schema
 
-![Table](assets/images/table.png)
+![Table](assets/images/db.png)
 
 # Database Models
 
