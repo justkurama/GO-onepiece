@@ -125,6 +125,66 @@ func GetOrganizationCharacters(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetOrganizationSubOrg(w http.ResponseWriter, r *http.Request) {
+	w = SetContentType(w)
+	params := mux.Vars(r)
+	idStr, ok := params["id"]
+	if !ok {
+		http.Error(w, "ID parameter is missing", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		return
+	}
+
+	type OrganizationInfo struct {
+		ID   uint   `json:"id"`
+		Name string `json:"name"`
+	}
+
+	var orgInfo OrganizationInfo
+	err = db.Table("organizations").Select("id, name").Where("id = ?", id).Scan(&orgInfo).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			http.Error(w, "Organization not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "Internal server error: "+err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	var subOrgs []struct {
+		ID   uint   `json:"id"`
+		Name string `json:"name"`
+	}
+	err = db.Table("sub_organizations").Select("id, name").Where("parent_id = ?", id).Scan(&subOrgs).Error
+	if err != nil {
+		http.Error(w, "Failed to retrieve suborganizations", http.StatusInternalServerError)
+		return
+	}
+
+	type OrganizationSubOrgResponse struct {
+		Organization     OrganizationInfo `json:"organization"`
+		SubOrganizations []struct {
+			ID   uint   `json:"id"`
+			Name string `json:"name"`
+		} `json:"suborganizations"`
+	}
+
+	response := OrganizationSubOrgResponse{
+		Organization:     orgInfo,
+		SubOrganizations: subOrgs,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
+}
+
 func GetAllOrganizations(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
 

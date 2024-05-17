@@ -6,50 +6,32 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/justkurama/GO-onepiece/internal/app/models"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 func CreateSubOrganization(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
-
-	var subOrg models.SubOrganization
-	err := json.NewDecoder(r.Body).Decode(&subOrg)
+	var subOrganization models.SubOrganization
+	err := json.NewDecoder(r.Body).Decode(&subOrganization)
 	if err != nil {
 		http.Error(w, "Failed to decode request body", http.StatusBadRequest)
 		return
 	}
 
-	// Assuming the request body includes the ParentID
-	parentID := r.URL.Query().Get("parent_id")
-	if parentID != "" {
-		parentIDInt, err := strconv.Atoi(parentID)
+	err = db.Create(&subOrganization).Error
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, err := w.Write([]byte("Internal server error"))
 		if err != nil {
-			http.Error(w, "Invalid parent_id", http.StatusBadRequest)
 			return
 		}
-		// Validate if parent organization exists
-		var parentOrg models.Organization
-		if err := db.First(&parentOrg, parentIDInt).Error; err != nil {
-			http.Error(w, "Parent organization not found", http.StatusNotFound)
-			return
-		}
-		// Assign the parent organization ID to the sub-organization
-		subOrg.ParentID = uint(parentIDInt)
-	}
-
-	// Create the sub-organization
-	if err := db.Create(&subOrg).Error; err != nil {
-		http.Error(w, "Failed to create sub-organization", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	_, err = w.Write([]byte("Sub-organization created"))
+	_, err = w.Write([]byte("SubOrganization created"))
 	if err != nil {
-		http.Error(w, "Failed to write response", http.StatusInternalServerError)
 		return
 	}
 }
@@ -141,97 +123,75 @@ func GetSubOrganizationCharacters(w http.ResponseWriter, r *http.Request) {
 }
 func GetAllSubOrganizations(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
-
-	page, err := strconv.Atoi(r.URL.Query().Get("page"))
-	if err != nil || page < 1 {
-		page = 1
-	}
-	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
-	if err != nil || limit <= 0 {
-		limit = 10
-	}
-
-	// Handling sorting
-	sortBy := r.URL.Query().Get("sortBy")
-	if sortBy == "" {
-		sortBy = "id asc"
-	} else {
-		allowedSortFields := map[string]bool{"id": true, "name": true}
-		sortFields := strings.Fields(sortBy)
-
-		if len(sortFields) == 1 {
-			sortFields = append(sortFields, "asc")
-		}
-
-		if len(sortFields) != 2 || !allowedSortFields[sortFields[0]] || (sortFields[1] != "asc" && sortFields[1] != "desc") {
-			http.Error(w, "Invalid sortBy parameter", http.StatusBadRequest)
-			return
-		}
-		sortBy = strings.Join(sortFields, " ")
-	}
-
-	offset := (page - 1) * limit
-
-	var suborganizations []models.SubOrganization
-	err = db.Preload(clause.Associations).Order(sortBy).Offset(offset).Limit(limit).Find(&suborganizations).Error
+	var subOrganizations []models.SubOrganization
+	err := db.Find(&subOrganizations).Error
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		_, err = w.Write([]byte("Internal server error: " + err.Error()))
+		_, err := w.Write([]byte("Internal server error"))
 		if err != nil {
 			return
 		}
 		return
 	}
-
 	w.WriteHeader(http.StatusOK)
-
-	sortBy = r.URL.Query().Get("sortBy")
-	if sortBy == "" {
-		sortBy = "id.asc"
-	}
-	err = json.NewEncoder(w).Encode(suborganizations)
+	err = json.NewEncoder(w).Encode(subOrganizations)
 	if err != nil {
-		http.Error(w, "Failed to encode organizations", http.StatusInternalServerError)
+		return
 	}
 }
+
 func UpdateSubOrganization(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
 	params := mux.Vars(r)
-	var organization models.Organization
-	err := json.NewDecoder(r.Body).Decode(&organization)
-	id, _ := strconv.Atoi(params["id"])
-	organization.ID = uint(id)
-	err = db.First(&organization, id).Error
+	id, err := strconv.Atoi(params["id"])
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, err := w.Write([]byte("Internal server error"))
-		if err != nil {
-			return
+		http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		return
+	}
+
+	var subOrganization models.SubOrganization
+	// Check if sub-organization exists
+	err = db.First(&subOrganization, id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			http.Error(w, "Sub-organization not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "Internal server error: "+err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
-	err = db.Save(&organization).Error
+
+	// Decode the request body into the subOrganization struct
+	err = json.NewDecoder(r.Body).Decode(&subOrganization)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, err := w.Write([]byte("Internal server error"))
-		if err != nil {
-			return
-		}
+		http.Error(w, "Failed to decode request body", http.StatusBadRequest)
 		return
 	}
+
+	// Ensure the ID in the struct is set correctly
+	subOrganization.ID = uint(id)
+
+	// Save the updated sub-organization
+	err = db.Save(&subOrganization).Error
+	if err != nil {
+		http.Error(w, "Internal server error: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
-	_, err = w.Write([]byte("Organization updated"))
+	_, err = w.Write([]byte("Sub-organization updated"))
 	if err != nil {
+		http.Error(w, "Failed to write response", http.StatusInternalServerError)
 		return
 	}
-	return
 }
+
 func DeleteSubOrganization(w http.ResponseWriter, r *http.Request) {
 	w = SetContentType(w)
 	params := mux.Vars(r)
 	id, _ := strconv.Atoi(params["id"])
-	var organization models.Organization
-	err := db.First(&organization, id).Error
+	var suborganization models.SubOrganization
+	err := db.First(&suborganization, id).Error
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, err := w.Write([]byte("Internal server error"))
@@ -240,7 +200,7 @@ func DeleteSubOrganization(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	err = db.Delete(&organization).Error
+	err = db.Delete(&suborganization).Error
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, err := w.Write([]byte("Internal server error"))
